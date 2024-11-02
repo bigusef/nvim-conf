@@ -1,8 +1,9 @@
 return {
 	"hrsh7th/nvim-cmp",
 	dependencies = {
-		"hrsh7th/cmp-nvim-lsp",
 		"onsails/lspkind.nvim",
+		"hrsh7th/cmp-nvim-lsp",
+		"hrsh7th/cmp-path",
 	},
 	config = function()
 		local cmp = require("cmp")
@@ -19,7 +20,7 @@ return {
 				end,
 			},
 			sources = cmp.config.sources({
-				{ name = "buffer" },
+				{ name = "path" },
 				{ name = "nvim_lsp" },
 				-- { name = "vsnip" }, -- For vsnip users.
 				-- { name = 'luasnip' }, -- For luasnip users.
@@ -37,7 +38,7 @@ return {
 				format = lspkind.cmp_format({
 					mode = "symbol_text",
 					menu = {
-						buffer = "[Buffer]",
+						path = "[Path]",
 						nvim_lsp = "[LSP]",
 						-- luasnip = "[LuaSnip]",
 						-- nvim_lua = "[Lua]",
@@ -49,6 +50,7 @@ return {
 				["<C-Space>"] = cmp.mapping.complete(),
 				["<CR>"] = cmp.mapping.confirm({ select = true }),
 			}),
+			completion = { completeopt = "menu,menuone,noinsert" },
 		})
 	end,
 }
