@@ -9,6 +9,13 @@ vim.o.relativenumber = true
 -- enable copy from vim to system clipbord
 vim.o.clipboard = "unnamedplus"
 
+-- enhance color's showing in the Termnail
+vim.o.termguicolors = true
+
+-- windows split
+vim.o.splitright = true
+vim.o.splitbelow = true
+
 -- enable case insensitive UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
