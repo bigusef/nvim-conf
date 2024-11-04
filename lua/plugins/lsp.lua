@@ -5,7 +5,7 @@ return {
 		config = function()
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "lua_ls", "ruff", "rust_analyzer" },
+				ensure_installed = { "lua_ls", "rust_analyzer", "basedpyright" },
 			})
 		end,
 	},
@@ -28,7 +28,7 @@ return {
 			})
 
 			-- Python lsp configuration
-			lspConfig.ruff.setup({
+			lspConfig.basedpyright.setup({
 				filetypes = { "python" },
 				capabilities = capabilities,
 			})
