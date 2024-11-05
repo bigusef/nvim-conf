@@ -43,7 +43,7 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
--- Sets how neovim will display certain whitespace characters in the editor.
+-- Sets how display certain whitespace characters in the editor.
 --  See `:help 'list'` and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
