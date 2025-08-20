@@ -21,8 +21,8 @@ jobs:
           fetch-depth: 0
           ref: main   # ✅ always check out main
 
-      - name: Fetch branches
-        run: git fetch origin main staging --prune
+#      - name: Fetch branches
+#        run: git fetch origin main staging --prune
 
       - name: Create Backport PR
         uses: peter-evans/create-pull-request@v7
