@@ -23,7 +23,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch_name: 'backport/${pull_number}'
           target_branches: staging
-          source_pr_number: ${{ github.event.pull_request.head.sha }}
+          source_pr_number: master
           add_labels: BackPort
           add_author_as_assignee: true
           copy_requested_reviewers: true
