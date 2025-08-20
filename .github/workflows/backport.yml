@@ -7,60 +7,13 @@ on:
       - main
 
 jobs:
-  backport:
-    name: Backport
+  backporting:
+    name: "Backporting"
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Backporting
+        uses: kiegroup/git-backporting@main
         with:
-          fetch-depth: 0
-
-      - name: Check diff between main and staging
-        id: diff
-        run: |
-          AHEAD_COUNT=$(git rev-list --count origin/staging..origin/main)
-          echo "main_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
-          if [ "$AHEAD_COUNT" -gt 0 ]; then
-            echo "has_diff=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_diff=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Prepare backport branch
-        if: steps.diff.outputs.has_diff == 'true'
-        run: |
-          BRANCH_NAME="backport/main-to-staging"
-          git checkout -B "$BRANCH_NAME" origin/main
-          git push --force --set-upstream origin "$BRANCH_NAME"
-
-      - name: Create or Update PR with GitHub API
-        if: steps.diff.outputs.has_diff == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          BRANCH_NAME="backport/main-to-staging"
-
-          # Check if PR already exists
-          EXISTING_PR=$(gh pr list --base staging --head "$BRANCH_NAME" --json number --jq '.[0].number')
-
-          if [ -n "$EXISTING_PR" ]; then
-            echo "PR #$EXISTING_PR already exists. Updating..."
-            gh pr edit "$EXISTING_PR" \
-              --title "Backport: Sync main → staging" \
-              --body "Automated backport PR to sync changes from **main** into **staging**." \
-              --add-label BackPort
-          else
-            echo "Creating new PR..."
-            gh pr create \
-              --base staging \
-              --head "$BRANCH_NAME" \
-              --title "Backport: Sync main → staging" \
-              --body "Automated backport PR to sync changes from **main** into **staging**." \
-              --label BackPort
-          fi
+          target-branch: v1
+          pull-request: ${{ github.event.pull_request.url }}
+          auth: ${{ secrets.GITHUB_TOKEN }}
