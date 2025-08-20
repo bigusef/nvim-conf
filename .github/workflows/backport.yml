@@ -1,43 +1,64 @@
 name: Backport Main → Staging
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     types: [ closed ]
     branches:
       - main
 
-permissions:
-  contents: write # so it can comment
-  pull-requests: write # so it can create pull requests
-
 jobs:
   backport:
+    name: Backport
     runs-on: ubuntu-latest
-#    outputs:
-#      pr_number: ${{ steps.create-pr.outputs.pull-request-number }}
-#      pr_url: ${{ steps.create-pr.outputs.pull-request-url }}
-
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Create backport pull requests
-        uses: korthout/backport-action@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          target_branches: "staging"
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0 # Required for backporting
-#
-#      - name: Backport to dev
-#        uses: korthout/backport-action@v2
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          target_branch: staging
-#          base_branch: main
-#          # Optional: Customize the title and body of the backport PR
-#          # title: 'Backport: ${{ github.event.pull_request.title }}'
-#          # body: 'This PR backports changes from #${{ github.event.pull_request.number }} to the `dev` branch.'
-#          # Optional: Specify cherry-picking behavior
-#          # cherry_picking: auto
+          fetch-depth: 0
+      - name: Check diff between master and develop
+        id: diff
+        run: |
+          git fetch origin master develop --prune
+          AHEAD_COUNT=$(git rev-list --count origin/master..origin/develop)
+          echo "master_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
+          if [ "$AHEAD_COUNT" -gt 0 ]; then
+            echo "has_diff=true" >> $GITHUB_OUTPUT
+            echo "Master is ahead of develop by $AHEAD_COUNT commits. Proceeding to create backport PR."
+          else
+            echo "has_diff=false" >> $GITHUB_OUTPUT
+            echo "No differences between master and develop. Skipping backport PR creation."
+          fi
+      - name: Prepare backport branch from master
+        if: steps.diff.outputs.has_diff == 'true'
+        id: prepare_branch
+        run: |
+          git fetch origin --prune
+          BRANCH_NAME="backport/${{ github.run_id }}"
+          git checkout -B "$BRANCH_NAME" origin/master
+          git push --force --set-upstream origin "$BRANCH_NAME"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+    #      - name: Create backport pull request (master -> develop)
+    #        if: steps.diff.outputs.has_diff == 'true'
+    #        id: create_pr
+    #        uses: peter-evans/create-pull-request@v7
+    #        with:
+    #          token: ${{ secrets.GITHUB_TOKEN }}
+    #          base: develop
+    #          branch: ${{ steps.prepare_branch.outputs.branch_name }}
+    #          title: "Release Backport"
+    #          body: |
+    #            Automated backport PR created by GitHub Actions after successful deploy and release.
+    #            - Source: master
+    #            - Target: develop
+    #            - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    #          labels: backport
+    #          reviewers: bigusef
+    #          draft: false
+    outputs:
+      #      pull_request_number: ${{ steps.create_pr.outputs.pull-request-number }}
+      pull_request_number: ""
+      #      pull_request_url: ${{ steps.create_pr.outputs.pull-request-url }}
+      pull_request_url: ""
