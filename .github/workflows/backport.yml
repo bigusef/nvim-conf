@@ -47,3 +47,6 @@ jobs:
           title: "Backport: Sync main → staging"
           body: |
             Automated backport PR to sync changes from **main** into **staging**.
+          labels: |
+            backport
+            automated
