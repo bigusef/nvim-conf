@@ -1,0 +1,53 @@
+name: Backport Main → Staging
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
+
+jobs:
+  backport:
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.create-pr.outputs.pull-request-number }}
+      pr_url: ${{ steps.create-pr.outputs.pull-request-url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check diff between main and staging
+        id: diff
+        run: |
+          git fetch origin main staging --prune
+          AHEAD_COUNT=$(git rev-list --count origin/staging..origin/main)
+          echo "main_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
+          if [ "$AHEAD_COUNT" -gt 0 ]; then
+            echo "has_diff=true" >> $GITHUB_OUTPUT
+            echo "main is ahead of staging by $AHEAD_COUNT commits. Proceeding to create backport PR."
+          else
+            echo "has_diff=false" >> $GITHUB_OUTPUT
+            echo "No differences between main and staging. Skipping backport PR creation."
+          fi
+
+      - name: Create PR main → staging
+        id: create-pr
+        if: steps.diff.outputs.has_diff == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: staging
+          branch: main
+          title: "Sync main → staging"
+          body: "Automated PR to sync changes from **main** to **staging**."
+          reviewers: bigusef
+
+      - name: Output PR details
+        if: steps.diff.outputs.has_diff == 'true'
+        run: |
+          echo "Created PR Number: ${{ steps.create-pr.outputs.pull-request-number }}"
+          echo "Created PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
