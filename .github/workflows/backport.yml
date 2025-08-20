@@ -2,7 +2,7 @@ name: Backport Main → Staging
 
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
     branches:
       - main
 
@@ -13,11 +13,13 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Check diff between main and staging
         id: diff
         run: |
@@ -31,6 +33,7 @@ jobs:
             echo "has_diff=false" >> $GITHUB_OUTPUT
             echo "No differences between main and staging. Skipping backport PR creation."
           fi
+
       - name: Prepare backport branch from main
         if: steps.diff.outputs.has_diff == 'true'
         id: prepare_branch
@@ -40,25 +43,18 @@ jobs:
           git checkout -B "$BRANCH_NAME" origin/main
           git push --force --set-upstream origin "$BRANCH_NAME"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-    #      - name: Create backport pull request (main -> staging)
-    #        if: steps.diff.outputs.has_diff == 'true'
-    #        id: create_pr
-    #        uses: peter-evans/create-pull-request@v7
-    #        with:
-    #          token: ${{ secrets.GITHUB_TOKEN }}
-    #          base: staging
-    #          branch: ${{ steps.prepare_branch.outputs.branch_name }}
-    #          title: "Release Backport"
-    #          body: |
-    #            Automated backport PR created by GitHub Actions after successful deploy and release.
-    #            - Source: main
-    #            - Target: staging
-    #            - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    #          labels: backport
-    #          reviewers: bigusef
-    #          draft: false
+
+      - name: Create Pull Request
+        if: steps.diff.outputs.has_diff == 'true'
+        id: create_pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: staging
+          head: ${{ steps.prepare_branch.outputs.branch_name }}
+          title: "Backport changes from main to staging"
+          body: |
+            This is an automated backport PR to sync changes from **main** into **staging**.
     outputs:
-      #      pull_request_number: ${{ steps.create_pr.outputs.pull-request-number }}
-      pull_request_number: ""
-      #      pull_request_url: ${{ steps.create_pr.outputs.pull-request-url }}
-      pull_request_url: ""
+      pull_request_number: ${{ steps.create_pr.outputs.pull-request-number }}
+      pull_request_url: ${{ steps.create_pr.outputs.pull-request-url }}
