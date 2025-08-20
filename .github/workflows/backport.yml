@@ -18,41 +18,41 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Check diff between master and develop
+      - name: Check diff between main and staging
         id: diff
         run: |
-          git fetch origin master develop --prune
-          AHEAD_COUNT=$(git rev-list --count origin/master..origin/develop)
-          echo "master_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
+          git fetch origin main staging --prune
+          AHEAD_COUNT=$(git rev-list --count origin/main..origin/staging)
+          echo "main_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
           if [ "$AHEAD_COUNT" -gt 0 ]; then
             echo "has_diff=true" >> $GITHUB_OUTPUT
-            echo "Master is ahead of develop by $AHEAD_COUNT commits. Proceeding to create backport PR."
+            echo "main is ahead of staging by $AHEAD_COUNT commits. Proceeding to create backport PR."
           else
             echo "has_diff=false" >> $GITHUB_OUTPUT
-            echo "No differences between master and develop. Skipping backport PR creation."
+            echo "No differences between main and staging. Skipping backport PR creation."
           fi
-      - name: Prepare backport branch from master
+      - name: Prepare backport branch from main
         if: steps.diff.outputs.has_diff == 'true'
         id: prepare_branch
         run: |
           git fetch origin --prune
           BRANCH_NAME="backport/${{ github.run_id }}"
-          git checkout -B "$BRANCH_NAME" origin/master
+          git checkout -B "$BRANCH_NAME" origin/main
           git push --force --set-upstream origin "$BRANCH_NAME"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-    #      - name: Create backport pull request (master -> develop)
+    #      - name: Create backport pull request (main -> staging)
     #        if: steps.diff.outputs.has_diff == 'true'
     #        id: create_pr
     #        uses: peter-evans/create-pull-request@v7
     #        with:
     #          token: ${{ secrets.GITHUB_TOKEN }}
-    #          base: develop
+    #          base: staging
     #          branch: ${{ steps.prepare_branch.outputs.branch_name }}
     #          title: "Release Backport"
     #          body: |
     #            Automated backport PR created by GitHub Actions after successful deploy and release.
-    #            - Source: master
-    #            - Target: develop
+    #            - Source: main
+    #            - Target: staging
     #            - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     #          labels: backport
     #          reviewers: bigusef
