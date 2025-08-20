@@ -13,8 +13,8 @@ jobs:
     permissions: write-all
     steps:
       - name: Backporting
-        uses: kiegroup/git-backporting@main
+        uses: korthout/backport-action@v2
         with:
-          target-branch: v1
-          pull-request: ${{ github.event.pull_request.url }}
-          auth: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.BACKPORT_GITHUB_TOKEN }} # Secret token with repo write access
+          branch_name: 'backport-${pull_number}-to-${target_branch}'
+          target_branches: staging
