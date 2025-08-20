@@ -42,6 +42,14 @@ jobs:
           git checkout -B "$BRANCH_NAME" origin/main
           git push --force --set-upstream origin "$BRANCH_NAME"
 
+      - name: Ensure labels exist
+        if: steps.diff.outputs.has_diff == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create backport --color FF5733 --description "Automated backport PR" || true
+          gh label create automated --color 4287f5 --description "Automated PRs" || true
+
       - name: Create or Update PR with GitHub API
         if: steps.diff.outputs.has_diff == 'true'
         env:
