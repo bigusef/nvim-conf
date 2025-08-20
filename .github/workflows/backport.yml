@@ -12,9 +12,9 @@ on:
 jobs:
   backport:
     runs-on: ubuntu-latest
-    outputs:
-      pr_number: ${{ steps.create-pr.outputs.pull-request-number }}
-      pr_url: ${{ steps.create-pr.outputs.pull-request-url }}
+#    outputs:
+#      pr_number: ${{ steps.create-pr.outputs.pull-request-number }}
+#      pr_url: ${{ steps.create-pr.outputs.pull-request-url }}
 
     steps:
       - uses: actions/checkout@v4
@@ -25,8 +25,8 @@ jobs:
         uses: korthout/backport-action@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          target_branch: dev
-          base_branch: master
+          target_branch: staging
+          base_branch: main
           # Optional: Customize the title and body of the backport PR
           # title: 'Backport: ${{ github.event.pull_request.title }}'
           # body: 'This PR backports changes from #${{ github.event.pull_request.number }} to the `dev` branch.'
