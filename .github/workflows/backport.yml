@@ -2,7 +2,7 @@ name: Backport Main → Staging
 
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
     branches:
       - main
 
@@ -21,15 +21,29 @@ jobs:
           fetch-depth: 0
           ref: main   # ✅ always check out main
 
-#      - name: Fetch branches
-#        run: git fetch origin main staging --prune
+      - name: Fetch branches
+        run: git fetch origin main staging --prune
 
-      - name: Create Backport PR
+      - name: Check diff between main and staging
+        id: diff
+        run: |
+          AHEAD_COUNT=$(git rev-list --count origin/staging..origin/main)
+          echo "main_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
+          if [ "$AHEAD_COUNT" -gt 0 ]; then
+            echo "has_diff=true" >> $GITHUB_OUTPUT
+            echo "main is ahead of staging by $AHEAD_COUNT commits. Proceeding to create backport PR."
+          else
+            echo "has_diff=false" >> $GITHUB_OUTPUT
+            echo "No differences between main and staging. Skipping backport PR creation."
+          fi
+
+      - name: Create/Update Backport PR
+        if: steps.diff.outputs.has_diff == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: staging   # PR target
-          branch: backport/${{ github.run_id }}   # temporary backport branch
-          title: "Backport changes from main to staging"
+          base: staging                      # Target branch for PR
+          branch: backport/main-to-staging   # ✅ Fixed name → PR will be updated, not duplicated
+          title: "Backport: Sync main → staging"
           body: |
             Automated backport PR to sync changes from **main** into **staging**.
