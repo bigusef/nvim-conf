@@ -19,30 +19,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main   # ✅ always check out main
-
-      - name: Fetch branches
-        run: git fetch origin main staging --prune
-
-      - name: Check diff between main and staging
-        id: diff
-        run: |
-          AHEAD_COUNT=$(git rev-list --count origin/staging..origin/main)
-          echo "main_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
-          if [ "$AHEAD_COUNT" -gt 0 ]; then
-            echo "has_diff=true" >> $GITHUB_OUTPUT
-            echo "main is ahead of staging by $AHEAD_COUNT commits. Proceeding to create backport PR."
-          else
-            echo "has_diff=false" >> $GITHUB_OUTPUT
-            echo "No differences between main and staging. Skipping backport PR creation."
-          fi
+          ref: staging   # ✅ always check out main
 
       - name: Create/Update Backport PR
         if: steps.diff.outputs.has_diff == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: staging                      # Target branch for PR
+          base: main                      # Target branch for PR
           branch: backport/main-to-staging   # ✅ Fixed name → PR will be updated, not duplicated
           title: "Backport: Sync main → staging"
           body: |
