@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write # so it can comment
+  pull-requests: write # so it can create pull requests
+
 jobs:
   backport:
     runs-on: ubuntu-latest
@@ -18,17 +22,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Required for backporting
-
-      - name: Backport to dev
-        uses: korthout/backport-action@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          target_branch: staging
-          base_branch: main
-          # Optional: Customize the title and body of the backport PR
-          # title: 'Backport: ${{ github.event.pull_request.title }}'
-          # body: 'This PR backports changes from #${{ github.event.pull_request.number }} to the `dev` branch.'
-          # Optional: Specify cherry-picking behavior
-          # cherry_picking: auto
+      - name: Create backport pull requests
+        uses: korthout/backport-action@v3
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0 # Required for backporting
+#
+#      - name: Backport to dev
+#        uses: korthout/backport-action@v2
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          target_branch: staging
+#          base_branch: main
+#          # Optional: Customize the title and body of the backport PR
+#          # title: 'Backport: ${{ github.event.pull_request.title }}'
+#          # body: 'This PR backports changes from #${{ github.event.pull_request.number }} to the `dev` branch.'
+#          # Optional: Specify cherry-picking behavior
+#          # cherry_picking: auto
