@@ -48,14 +48,15 @@ jobs:
       - name: Create Pull Request
         if: steps.diff.outputs.has_diff == 'true'
         id: create_pr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: staging
-          branch: ${{ steps.prepare_branch.outputs.branch_name }}
-          title: "Backport changes from main to staging"
-          body: |
-            This is an automated backport PR to sync changes from **main** into **staging**.
+        run: |
+          BRANCH_NAME="${{ steps.prepare_branch.outputs.branch_name }}"
+          gh pr create \
+            --base staging \
+            --head "$BRANCH_NAME" \
+            --title "Backport changes from main to staging" \
+            --body "This is an automated backport PR to sync changes from **main** into **staging**."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       pull_request_number: ${{ steps.create_pr.outputs.pull-request-number }}
       pull_request_url: ${{ steps.create_pr.outputs.pull-request-url }}
