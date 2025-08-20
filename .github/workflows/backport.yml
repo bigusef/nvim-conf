@@ -43,6 +43,7 @@ jobs:
           git checkout -B "$BRANCH_NAME" origin/main
           git push --force --set-upstream origin "$BRANCH_NAME"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "branch_name=$BRANCH_NAME"
 
       - name: Create Pull Request
         if: steps.diff.outputs.has_diff == 'true'
