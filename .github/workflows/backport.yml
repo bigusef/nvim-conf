@@ -10,6 +10,7 @@ jobs:
   backporting:
     name: "Backporting"
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Backporting
         uses: kiegroup/git-backporting@main
