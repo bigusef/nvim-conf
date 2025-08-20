@@ -22,7 +22,6 @@ jobs:
           ref: staging   # ✅ always check out main
 
       - name: Create/Update Backport PR
-        if: steps.diff.outputs.has_diff == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
