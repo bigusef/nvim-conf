@@ -51,7 +51,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: staging
-          head: ${{ steps.prepare_branch.outputs.branch_name }}
+          branch: ${{ steps.prepare_branch.outputs.branch_name }}
           title: "Backport changes from main to staging"
           body: |
             This is an automated backport PR to sync changes from **main** into **staging**.
