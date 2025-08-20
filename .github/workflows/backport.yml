@@ -15,14 +15,10 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout repository (main)
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main
-
-      - name: Fetch branches
-        run: git fetch origin main staging --prune
 
       - name: Check diff between main and staging
         id: diff
@@ -42,14 +38,6 @@ jobs:
           git checkout -B "$BRANCH_NAME" origin/main
           git push --force --set-upstream origin "$BRANCH_NAME"
 
-      - name: Ensure labels exist
-        if: steps.diff.outputs.has_diff == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh label create backport --color FF5733 --description "Automated backport PR" || true
-          gh label create automated --color 4287f5 --description "Automated PRs" || true
-
       - name: Create or Update PR with GitHub API
         if: steps.diff.outputs.has_diff == 'true'
         env:
@@ -66,7 +54,7 @@ jobs:
             gh pr edit "$EXISTING_PR" \
               --title "Backport: Sync main → staging" \
               --body "Automated backport PR to sync changes from **main** into **staging**." \
-              --add-label backport --add-label automated
+              --add-label BackPort
           else
             echo "Creating new PR..."
             gh pr create \
@@ -74,5 +62,5 @@ jobs:
               --head "$BRANCH_NAME" \
               --title "Backport: Sync main → staging" \
               --body "Automated backport PR to sync changes from **main** into **staging**." \
-              --label backport --label automated
+              --label BackPort
           fi
