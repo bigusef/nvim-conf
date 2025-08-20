@@ -13,8 +13,8 @@ jobs:
     permissions: write-all
     steps:
       - name: Backporting
-        uses: korthout/backport-action@v2
+        uses: korthout/backport-action@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # Secret token with repo write access
-          branch_name: 'backport-${pull_number}-to-${target_branch}'
+          branch_name: 'backport'
           target_branches: staging
