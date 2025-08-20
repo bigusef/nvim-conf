@@ -17,79 +17,18 @@ jobs:
       pr_url: ${{ steps.create-pr.outputs.pull-request-url }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check diff between main and staging
-        id: diff
-        run: |
-          git fetch origin main staging --prune
-          AHEAD_COUNT=$(git rev-list --count origin/staging..origin/main)
-          echo "main_ahead_count=${AHEAD_COUNT}" >> $GITHUB_OUTPUT
-          if [ "$AHEAD_COUNT" -gt 0 ]; then
-            echo "has_diff=true" >> $GITHUB_OUTPUT
-            echo "main is ahead of staging by $AHEAD_COUNT commits. Proceeding to create backport PR."
-          else
-            echo "has_diff=false" >> $GITHUB_OUTPUT
-            echo "No differences between main and staging. Skipping backport PR creation."
-          fi
-
-      - name: Create PR main → staging
-        id: create-pr
-        if: steps.diff.outputs.has_diff == 'true'
-        uses: actions/github-script@v7
+      - uses: actions/checkout@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const base = 'staging';
-            const head = 'main';
-            const title = 'Sync main → staging';
-            const body = 'Automated PR to sync changes from **main** to **staging**.';
+          fetch-depth: 0 # Required for backporting
 
-            // Check for existing open PR from main to staging to avoid duplicates
-            const { data: prs } = await github.rest.pulls.list({
-              owner,
-              repo,
-              state: 'open',
-              head: `${owner}:${head}`,
-              base,
-            });
-
-            let pr;
-            if (prs && prs.length > 0) {
-              pr = prs[0];
-            } else {
-              pr = (
-                await github.rest.pulls.create({
-                  owner,
-                  repo,
-                  head,
-                  base,
-                  title,
-                  body,
-                })
-              ).data;
-            }
-
-            // Request reviewers (if permissions allow)
-            try {
-              await github.rest.pulls.requestReviewers({
-                owner,
-                repo,
-                pull_number: pr.number,
-                reviewers: ['bigusef'],
-              });
-            } catch (e) {
-              core.warning(`Request reviewers failed: ${e.message}`);
-            }
-
-            core.setOutput('pull-request-number', String(pr.number));
-            core.setOutput('pull-request-url', pr.html_url);
-
-      - name: Output PR details
-        if: steps.diff.outputs.has_diff == 'true'
-        run: |
-          echo "Created PR Number: ${{ steps.create-pr.outputs.pull-request-number }}"
-          echo "Created PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
+      - name: Backport to dev
+        uses: korthout/backport-action@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_branch: dev
+          base_branch: master
+          # Optional: Customize the title and body of the backport PR
+          # title: 'Backport: ${{ github.event.pull_request.title }}'
+          # body: 'This PR backports changes from #${{ github.event.pull_request.number }} to the `dev` branch.'
+          # Optional: Specify cherry-picking behavior
+          # cherry_picking: auto
