@@ -15,16 +15,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # fetch full history so backport has all commits
+          fetch-depth: 0
 
-      - name: Backporting
+      - name: Create backport PR
         uses: korthout/backport-action@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch_name: 'backport/${pull_number}'
           target_branches: staging
-          copy_requested_reviewers: true
-          source_pr_number: main
-          add_author_as_assignee: true
+          source_pr_number: ${{ github.event.pull_request.head.sha }}
           add_labels: BackPort
+          add_author_as_assignee: true
+          copy_requested_reviewers: true
 
