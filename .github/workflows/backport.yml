@@ -24,7 +24,7 @@ jobs:
           branch_name: 'backport/${pull_number}'
           target_branches: staging
           copy_requested_reviewers: true
-          source_pr_number: ${{ github.event.pull_request.head.sha }}
+          source_pr_number: main
           add_author_as_assignee: true
           add_labels: BackPort
 
