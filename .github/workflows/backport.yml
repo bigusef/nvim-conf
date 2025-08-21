@@ -1,0 +1,26 @@
+name: Backport merged PRs from main to staging
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  backport:
+    if: ${{ github.event.pull_request.merged == true}}
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create backport pull requests
+        uses: korthout/backport-action@v3
+        with:
+          target_branches: staging
+          branch_name: "backport/${pull_number}-to-${target_branch}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          add_labels: BackPort
+          add_author_as_assignee: true
