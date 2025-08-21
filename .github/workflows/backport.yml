@@ -24,3 +24,14 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           add_labels: BackPort
           add_author_as_assignee: true
+
+      - name: Output PR Status
+        if: always()
+        run: |
+          if [ -n "${{ steps.backport.outputs.pull_request_urls }}" ]; then
+            echo "PR Created: ${{ steps.backport.outputs.pull_request_urls }}"
+          else
+            echo "No PR Created"
+          fi
+          
+    
