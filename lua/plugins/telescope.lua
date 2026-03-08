@@ -8,6 +8,12 @@ return {
 	},
 	config = function()
 		require("telescope").setup({
+			defaults = {
+				file_ignore_patterns = { "__pycache__/", "%.pyc" },
+				preview = {
+					treesitter = false,
+				},
+			},
 			extensions = {
 				["ui-select"] = {
 					require("telescope.themes").get_dropdown(),
@@ -29,7 +35,7 @@ return {
 		vim.keymap.set("n", "<leader>sr", builtin.oldfiles, { desc = "[S]earch [R]ecent Files" })
 
 		-- Shortcut for searching your Neovim configuration files
-		vim.keymap.set("n", "<leader>,", function()
+		vim.keymap.set("n", "<leader>sn", function()
 			builtin.find_files({ cwd = vim.fn.stdpath("config") })
 		end, { desc = "[S]earch [N]eovim files" })
 	end,

@@ -3,7 +3,7 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		main = "nvim-treesitter.configs",
+		main = "nvim-treesitter",
 		opts = {
 			ensure_installed = { "lua", "python", "rust", "sql" },
 			auto_install = true,

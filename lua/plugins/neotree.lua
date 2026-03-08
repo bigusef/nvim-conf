@@ -18,6 +18,10 @@ return {
                         ".git",
                         "node_modules",
                         "target",
+                        "__pycache__",
+                    },
+                    hide_by_pattern = {
+                        "*.pyc",
                     },
                 },
                 follow_current_file = {
@@ -27,7 +31,7 @@ return {
             },
             window = {
                 mappings = {
-                    ["L"] = "open_nofocus",
+                    ["<A-l>"] = "open_nofocus",
                 },
             },
             commands = {
@@ -40,6 +44,6 @@ return {
             },
         })
 
-        -- vim.keymap.set("n", "<A-e>", ":Neotree toggle<CR>", { desc = "File [E]xploer ", noremap = true, silent = true })
+        vim.keymap.set("n", "<A-e>", ":Neotree toggle<CR>", { desc = "File [E]xploer ", noremap = true, silent = true })
     end,
 }
