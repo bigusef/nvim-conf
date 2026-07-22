@@ -1,4 +1,5 @@
 *.json
+!lazy-lock.json
 .idea
 .vscode
 

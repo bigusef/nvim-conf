@@ -40,6 +40,12 @@ vim.opt.inccommand = "split"
 -- Show which line your cursor is on
 vim.opt.cursorline = true
 
+-- Save undo history to disk
+vim.o.undofile = true
+
+-- Always show the sign column so the gutter doesn't jump
+vim.o.signcolumn = "yes"
+
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
