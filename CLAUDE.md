@@ -22,6 +22,8 @@
 | `<leader>t` | **T**oggle | Toggle features on/off |
 | `<leader>b` | **B**uffer | Buffer management (delete, pin, etc.) |
 | `<leader>g` | **G**it | Git operations (blame, stage, diff) |
+| `<leader>d` | **D**ebug | DAP (breakpoints, stepping, UI) |
+| `<leader>T` | **T**est | Run tests (neotest; jdtls for java) |
 | `<leader>q` | (standalone) | Open diagnostic quickfix list |
 
 ### Hard Rules

@@ -6,19 +6,30 @@ return {
 			"onsails/lspkind.nvim",
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
+			"saadparwaiz1/cmp_luasnip",
+			{
+				"L3MON4D3/LuaSnip",
+				build = "make install_jsregexp",
+				dependencies = { "rafamadriz/friendly-snippets" },
+			},
 		},
 		config = function()
 			local cmp = require("cmp")
 			local lspkind = require("lspkind")
+			local luasnip = require("luasnip")
+
+			-- community snippets (java, rails, python, ...) in vscode format
+			require("luasnip.loaders.from_vscode").lazy_load()
 
 			cmp.setup({
 				snippet = {
 					expand = function(args)
-						vim.snippet.expand(args.body)
+						luasnip.lsp_expand(args.body)
 					end,
 				},
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
 					{ name = "path" },
 				}),
 				view = {
@@ -34,12 +45,31 @@ return {
 						menu = {
 							path = "[Path]",
 							nvim_lsp = "[LSP]",
+							luasnip = "[Snip]",
 						},
 					}),
 				},
 				mapping = cmp.mapping.preset.insert({
 					["<C-Space>"] = cmp.mapping.complete(),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
+					["<Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_next_item()
+						elseif luasnip.locally_jumpable(1) then
+							luasnip.jump(1)
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_prev_item()
+						elseif luasnip.locally_jumpable(-1) then
+							luasnip.jump(-1)
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
 				}),
 				completion = { completeopt = "menu,menuone,noinsert" },
 			})
