@@ -54,8 +54,7 @@ vim.opt.scrolloff = 10
 vim.opt.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
--- indentation options
--- vim.o.shiftwidth = 4
+-- indentation defaults; vim-sleuth and ftplugins override per language/project
 vim.o.tabstop = 4
--- vim.o.softtabstop = 4
--- vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
