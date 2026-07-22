@@ -92,6 +92,20 @@ return {
 			},
 		})
 
+		-- ruff owns linting/imports/formatting for python, pyright owns types
+		vim.lsp.config("pyright", {
+			settings = {
+				pyright = {
+					disableOrganizeImports = true,
+				},
+			},
+		})
+		vim.lsp.config("ruff", {
+			on_attach = function(client)
+				client.server_capabilities.hoverProvider = false
+			end,
+		})
+
 		-- rename support for neo-tree file operations
 		require("lsp-file-operations").setup()
 
@@ -100,17 +114,22 @@ return {
 			ensure_installed = {
 				"lua-language-server",
 				"pyright",
+				"ruff",
+				"jdtls",
+				"vscode-spring-boot-tools",
+				"ruby-lsp",
+				"rubocop",
 				"rust-analyzer",
 				"stylua",
 				"tree-sitter-cli",
 			},
 		})
 
-		-- automatic_enable calls vim.lsp.enable() for every mason-installed server;
-		-- stylua is excluded because conform runs it as a CLI formatter instead
+		-- automatic_enable calls vim.lsp.enable() for every mason-installed server, except:
+		-- stylua/rubocop run as formatters (conform / ruby-lsp), jdtls is started by nvim-jdtls
 		require("mason-lspconfig").setup({
 			automatic_enable = {
-				exclude = { "stylua" },
+				exclude = { "stylua", "rubocop", "jdtls" },
 			},
 		})
 	end,
