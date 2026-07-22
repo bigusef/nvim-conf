@@ -1,29 +1,30 @@
 -- Clear highlights on search when pressing <Esc> in normal mode
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
--- file saving
+-- Editor essentials (Ctrl)
 vim.keymap.set("n", "<C-s>", "<cmd>w<CR>", { desc = "Save file" })
-
--- quit file
 vim.keymap.set("n", "<C-q>", "<cmd>q<CR>", { desc = "Quit file" })
 
--- Keybinds to make split navigation easier.
---  See `:help wincmd` for a list of all window commands
-vim.keymap.set("n", "<C-h>", ":wincmd h<CR>", { desc = "Move focus to the left window" })
-vim.keymap.set("n", "<C-j>", ":wincmd j<CR>", { desc = "Move focus to the lower window" })
-vim.keymap.set("n", "<C-l>", ":wincmd l<CR>", { desc = "Move focus to the right window" })
-vim.keymap.set("n", "<C-k>", ":wincmd k<CR>", { desc = "Move focus to the upper window" })
+-- Window navigation (Ctrl)
+vim.keymap.set("n", "<C-h>", "<cmd>wincmd h<CR>", { desc = "Move focus to the left window" })
+vim.keymap.set("n", "<C-j>", "<cmd>wincmd j<CR>", { desc = "Move focus to the lower window" })
+vim.keymap.set("n", "<C-l>", "<cmd>wincmd l<CR>", { desc = "Move focus to the right window" })
+vim.keymap.set("n", "<C-k>", "<cmd>wincmd k<CR>", { desc = "Move focus to the upper window" })
 
--- Diagnostic keymaps
+-- Buffer navigation ([/] convention)
+vim.keymap.set("n", "[b", "<cmd>bprev<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "]b", "<cmd>bnext<CR>", { desc = "Next buffer" })
+
+-- Buffer management (Leader + b namespace)
+vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "[B]uffer [D]elete" })
+
+-- Diagnostic navigation ([/] convention)
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
--- delete single character without copying into register
-vim.keymap.set("n", "x", '"_x')
-
--- Keep last yanked when pasting
-vim.keymap.set("v", "p", '"_dP')
-
--- Stay in visual mode when indent
-vim.keymap.set("v", "<", "<gv")
-vim.keymap.set("v", ">", ">gv")
-
+-- Vim motion overrides
+vim.keymap.set("n", "x", '"_x', { desc = "Delete char without yank" })
+vim.keymap.set("v", "p", '"_dP', { desc = "Paste without yank" })
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left and stay in visual" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right and stay in visual" })
